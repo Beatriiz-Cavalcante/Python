@@ -21,7 +21,17 @@ def main(pagina):
     titulo = ft.Text("Hashzap")
     #Estilo do chat (vertical)
     chat = ft.Column()
-        
+
+    #tunel de comunicação com o webscket (elemento 6 - não visual)
+    def enviar_mensagem_tunel(mensagem):
+        #função que vai ser executada por todos os usuários quando a mensaem for adicionada
+        texto = ft.Text(mensagem) #define o ft.Text aqui porque quando convertido antes ficar mais complexo de passar pelo túnel 
+        chat.controls.append(texto)
+        pagina.update()
+    #função para definir ações do tunel (a função usada pelo botao deve ser definida antes de ser chamada)
+    #pubsub é a palavra reservada no flet para tunel de comunicação 
+    pagina.pubsub.subscribe(enviar_mensagem_tunel)
+
     #função botaopopup (a função usada pelo botao deve ser definida antes de ser chamada)
     def entrar_chat(evento):
         #fechar popup
@@ -39,8 +49,8 @@ def main(pagina):
         def enviar_mensagem(evento):
             nome_usuario = caixa_nome.value
             texto_campo_mensagem = campo_enviar_mensagem.value
-            texto = ft.Text(f"{nome_usuario}: {texto_campo_mensagem}")
-            chat.controls.append(texto)
+            mensagem = f"{nome_usuario}: {texto_campo_mensagem}"
+            pagina.pubsub.send_all(mensagem)
             #limpar a caixa de enviar mensagem
             campo_enviar_mensagem.value = ""
             pagina.update()
@@ -53,8 +63,8 @@ def main(pagina):
         pagina.add(linha_enviar)
         #adicionar no chat a mensagem "Fulano entrou no site"
         nome_usuario = caixa_nome.value
-        texto_mensagem = ft.Text(f"{nome_usuario} entrou no chat")
-        chat.controls.append(texto_mensagem)
+        mensagem = f"{nome_usuario} entrou no chat"
+        pagina.pubsub.send_all(mensagem)
         pagina.update()
 
     #popup (elemento 3)
